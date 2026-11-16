@@ -1,0 +1,148 @@
+openapi: 3.0.4
+info:
+  title: Image to PDF
+  description: >-
+    Image to PDF combines up to 20 images, uploaded or fetched from URLs, into
+    one PDF with one image per page, and returns a download link valid for 2
+    days. Pages can match each image or be A4, Letter or Legal with a margin,
+    and multi-page TIFF scans and animated GIFs become one page per frame.
+  termsOfService: https://apiverve.com/terms/
+  contact:
+    name: APIVerve Support
+    email: hello@apiverve.com
+    url: https://apiverve.com/contact
+  version: 1.0.0
+externalDocs:
+  description: Learn more about APIVerve
+  url: https://docs.apiverve.com?utm_source=openapi
+servers:
+  - url: https://api.apiverve.com/
+paths:
+  /v1/imagetopdf:
+    post:
+      summary: Image to PDF
+      description: >-
+        Combine uploaded images, or image URLs, into one PDF with one image (or
+        frame) per page
+      operationId: imagetopdf
+      parameters:
+        - name: urls
+          in: query
+          schema:
+            type: string
+          required: false
+          description: >-
+            A JSON array of public image URLs, added in order after image. Up to
+            20 images per call in all
+        - name: pageSize
+          in: query
+          schema:
+            type: string
+          required: false
+          description: >-
+            Page size: fit makes each page the size of its image; a4, letter and
+            legal fit the image inside the margins
+          example: a4
+        - name: orientation
+          in: query
+          schema:
+            type: string
+          required: false
+          description: >-
+            Page orientation for a4, letter and legal; auto turns each page to
+            match its image. Ignored for fit
+          example: auto
+        - name: margin
+          in: query
+          schema:
+            type: number
+          required: false
+          description: Margin around each image in millimetres, from 0 to 50
+          example: 10
+        - name: quality
+          in: query
+          schema:
+            type: integer
+          required: false
+          description: >-
+            Re-compress every image as JPG at this quality (1-100) to make the
+            PDF smaller. Omit to keep JPG and PNG images unchanged
+          example: 80
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: status
+                  error:
+                    type: string
+                    description: error
+                  data:
+                    type: object
+                    description: data
+              example:
+                status: ok
+                error: null
+                data:
+                  pdfName: 7c1e4b9a-2f3d-4e8a-9b6c-5d0a1f2e3c4b.pdf
+                  imageCount: 2
+                  pageCount: 2
+                  pageSize: a4
+                  orientation: auto
+                  margin: 10
+                  quality: null
+                  size: 483291
+                  expires: 1792400000000
+                  downloadURL: https://storage.googleapis.com/apiverve/APIData/imagetopdf/7c1e4b9a-2f3d-4e8a-9b6c-5d0a1f2e3c4b.pdf?GoogleAccessId=635500398038-compute%40developer.gserviceaccount.com&Expires=1792400000&Signature=SAMPLE
+        '401':
+          description: Your request was not authorized, or your API Key was invalid
+        '404':
+          description: Requested resource was not found
+        '500':
+          description: A server error has occurred, try again later
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: >-
+                    File to upload (accepted: .jpg, .jpeg, .png, .gif, .webp,
+                    .bmp, .tif, .tiff, .heic, .heif, .avif, max 25MB)
+                  x-acceptedTypes:
+                    - .jpg
+                    - .jpeg
+                    - .png
+                    - .gif
+                    - .webp
+                    - .bmp
+                    - .tif
+                    - .tiff
+                    - .heic
+                    - .heif
+                    - .avif
+                  x-maxSizeMB: 25
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: x-api-key
+      in: header
+security:
+  - api_key: []
+sampleRequest:
+  urls:
+    - https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200
+    - https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200
+  pageSize: a4
+  orientation: auto
+  margin: 10
